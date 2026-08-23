@@ -1,0 +1,680 @@
+/* ============================================================================
+   Terminal portfolio — hand-rolled styles.
+   Theme palettes live in [data-theme] blocks below; src/themes.ts must stay
+   in sync with the names defined here.
+   ========================================================================== */
+
+:root {
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono",
+    monospace;
+
+  /* fallback = phosphor */
+  --bg: #050b07;
+  --bg-panel: #081209;
+  --border: #123c1e;
+  --fg: #8af7a8;
+  --fg-dim: #3f7a52;
+  --accent: #41ff7d;
+  --ok: #41ff7d;
+  --warn: #d8ff5e;
+  --err: #ff5e5e;
+  --select: #0f4020;
+  --glow: rgba(65, 255, 125, 0.28);
+  --crt-strength: 1;
+}
+
+:root[data-theme="phosphor"] {
+  --bg: #050b07;
+  --bg-panel: #081209;
+  --border: #123c1e;
+  --fg: #8af7a8;
+  --fg-dim: #3f7a52;
+  --accent: #41ff7d;
+  --ok: #41ff7d;
+  --warn: #d8ff5e;
+  --err: #ff5e5e;
+  --select: #0f4020;
+  --glow: rgba(65, 255, 125, 0.28);
+  --crt-strength: 1;
+}
+
+:root[data-theme="amber"] {
+  --bg: #0b0703;
+  --bg-panel: #120b05;
+  --border: #4a2f10;
+  --fg: #ffcf8f;
+  --fg-dim: #9a7340;
+  --accent: #ffb000;
+  --ok: #ffcf5e;
+  --warn: #ffe08a;
+  --err: #ff6a4a;
+  --select: #4a3008;
+  --glow: rgba(255, 176, 0, 0.26);
+  --crt-strength: 1;
+}
+
+:root[data-theme="ice"] {
+  --bg: #04080f;
+  --bg-panel: #070e1a;
+  --border: #14304f;
+  --fg: #bfe3ff;
+  --fg-dim: #5d84a8;
+  --accent: #7fd6ff;
+  --ok: #7fffd4;
+  --warn: #ffe08a;
+  --err: #ff7a9e;
+  --select: #123a5c;
+  --glow: rgba(127, 214, 255, 0.26);
+  --crt-strength: 1;
+}
+
+:root[data-theme="paper"] {
+  --bg: #f2efe6;
+  --bg-panel: #e9e5d8;
+  --border: #c9c2ad;
+  --fg: #26251f;
+  --fg-dim: #6f6a58;
+  --accent: #0f6b34;
+  --ok: #0f6b34;
+  --warn: #8a6d00;
+  --err: #b3261e;
+  --select: #d8e6cf;
+  --glow: rgba(38, 37, 31, 0.08);
+  --crt-strength: 0.45;
+}
+
+:root[data-theme="plasma"] {
+  --bg: #0a0510;
+  --bg-panel: #100819;
+  --border: #3c1a5c;
+  --fg: #f0c8ff;
+  --fg-dim: #8f6aa8;
+  --accent: #e05aff;
+  --ok: #8affd4;
+  --warn: #ffd45e;
+  --err: #ff5e8a;
+  --select: #3c1050;
+  --glow: rgba(224, 90, 255, 0.26);
+  --crt-strength: 1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--select);
+  color: var(--fg);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------ layout */
+
+.term-root {
+  height: 100dvh;
+  display: flex;
+  padding: clamp(0px, 2.2vmin, 22px);
+}
+
+.term-window {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in srgb, var(--bg) 92%, var(--bg-panel));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--border) 55%, transparent),
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 0 90px var(--glow);
+}
+
+/* --------------------------------------------------------------- title bar */
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+  user-select: none;
+}
+
+.dots {
+  display: flex;
+  gap: 7px;
+}
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+}
+.dot-r {
+  background: color-mix(in srgb, var(--err) 65%, transparent);
+}
+.dot-y {
+  background: color-mix(in srgb, var(--warn) 65%, transparent);
+}
+.dot-g {
+  background: color-mix(in srgb, var(--ok) 65%, transparent);
+}
+
+.titlebar-title {
+  flex: 1;
+  text-align: center;
+  color: var(--fg-dim);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.titlebar-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+}
+.online {
+  color: var(--ok);
+  letter-spacing: 0.12em;
+}
+
+/* ------------------------------------------------------------------- chips */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.chips-label {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  margin-right: 2px;
+}
+
+.chip {
+  font: inherit;
+  font-size: 13px;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 12px;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background 120ms ease;
+}
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.chip:active {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* -------------------------------------------------------------- scrollback */
+
+.scrollback {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px 18px 26px;
+}
+
+.hero {
+  margin-bottom: 22px;
+}
+
+.hero-top {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.ascii {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.25;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--glow);
+  user-select: none;
+}
+
+.hero-text {
+  min-width: 0;
+}
+
+.tagline {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 4px 0 2px;
+  font-size: clamp(24px, 4.5vw, 34px);
+  letter-spacing: 0.04em;
+  color: var(--fg);
+  text-shadow: 0 0 16px var(--glow);
+}
+
+.role {
+  font-size: 14px;
+}
+
+.status {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.hero-bio {
+  margin-top: 16px;
+  max-width: 72ch;
+}
+.hero-bio p {
+  margin: 0;
+}
+
+.hint {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+.accent {
+  color: var(--accent);
+}
+
+.dim {
+  color: var(--fg-dim);
+}
+.ok {
+  color: var(--ok);
+}
+.err {
+  color: var(--err);
+}
+
+/* ------------------------------------------------------------------- lines */
+
+.output {
+  display: flex;
+  flex-direction: column;
+}
+
+.ln {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  min-height: 1.2em;
+}
+
+.ln-cmd::before {
+  content: "guest@nashit:~$ ";
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--glow);
+}
+.ln-cmd {
+  margin-top: 10px;
+  color: var(--fg);
+}
+
+.ln-out {
+  color: var(--fg);
+}
+
+.ln-dim {
+  color: var(--fg-dim);
+}
+
+.ln-ok {
+  color: var(--ok);
+}
+
+.ln-warn {
+  color: var(--warn);
+}
+
+.ln-err {
+  color: var(--err);
+}
+
+.ln-heading {
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--glow);
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+}
+
+.ln-link a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ln-link a:visited {
+  color: var(--accent);
+}
+.ln-link a:hover {
+  background: var(--select);
+}
+
+.ln-raw {
+  margin: 0;
+  font-family: inherit;
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--glow);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ------------------------------------------------------------ status/prompt */
+
+.prompt-area {
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+
+.statusline {
+  padding: 6px 14px 0;
+  font-size: 12px;
+  min-height: 1.4em;
+}
+
+.prompt-row {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  padding: 8px 14px 12px;
+  cursor: text;
+}
+
+.prompt-text {
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--glow);
+  white-space: pre;
+  user-select: none;
+}
+
+.mirror {
+  white-space: pre;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.cursor {
+  display: inline-block;
+  min-width: 0.62em;
+  background: var(--accent);
+  color: var(--bg);
+  text-shadow: none;
+  animation: blink 1.1s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* the real input is invisible but focusable & keyboard-interactive */
+.prompt-real {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  border: 0;
+  padding: 0;
+  font-size: 16px; /* prevents iOS focus zoom */
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+}
+
+.prompt-real:focus {
+  outline: none;
+}
+
+/* --------------------------------------------------------------- boot view */
+
+.boot {
+  padding-top: 4vh;
+  font-size: 14px;
+}
+
+.boot-head {
+  color: var(--accent);
+  text-shadow: 0 0 12px var(--glow);
+  letter-spacing: 0.14em;
+  margin-bottom: 14px;
+}
+
+.boot-line {
+  white-space: pre-wrap;
+}
+
+.boot-caret {
+  display: inline-block;
+  width: 0.62em;
+  height: 1.05em;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: blink 1s step-end infinite;
+}
+
+.boot-skip {
+  margin-top: 22px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+
+/* -------------------------------------------------------------- CRT layers */
+
+.crt-scanlines,
+.crt-vignette,
+.crt-flicker {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+}
+
+.crt-on .crt-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.28) 0px,
+    rgba(0, 0, 0, 0.28) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: calc(0.5 * var(--crt-strength));
+  mix-blend-mode: multiply;
+}
+
+.crt-on .crt-vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 58%,
+    color-mix(in srgb, black calc(38% * var(--crt-strength)), transparent) 100%
+  );
+}
+
+.crt-on .crt-flicker {
+  background: #fff;
+  opacity: 0.015;
+  animation: flicker 3.4s steps(60) infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.012;
+  }
+  8% {
+    opacity: 0.03;
+  }
+  9% {
+    opacity: 0.01;
+  }
+  32% {
+    opacity: 0.022;
+  }
+  33% {
+    opacity: 0.008;
+  }
+  61% {
+    opacity: 0.032;
+  }
+  62% {
+    opacity: 0.014;
+  }
+  87% {
+    opacity: 0.024;
+  }
+}
+
+/* ----------------------------------------------------------- custom cursor */
+
+.term-root {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M4 2l12 8-5.2 1.2L14 17l-2.6 1.2-3.2-5.8L4 16z' fill='%2341ff7d' stroke='%23050b07' stroke-width='1'/%3E%3C/svg%3E")
+      2 2,
+    default;
+}
+
+.term-root a,
+.term-root button,
+.term-root .chip {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 22 22'%3E%3Crect x='3' y='3' width='16' height='16' rx='3' fill='%23050b07' stroke='%2341ff7d' stroke-width='2'/%3E%3Crect x='7' y='9' width='8' height='4' fill='%2341ff7d'/%3E%3C/svg%3E")
+      11 11,
+    pointer;
+}
+
+.prompt-row {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 18 18'%3E%3Crect x='7' y='2' width='4' height='14' fill='%2341ff7d' stroke='%23050b07' stroke-width='1'/%3E%3C/svg%3E")
+      9 9,
+    text;
+}
+
+/* ------------------------------------------------------------------ mobile */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .term-root {
+    padding: 0;
+  }
+
+  .term-window {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .titlebar-title {
+    font-size: 11px;
+  }
+
+  .scrollback {
+    padding: 14px 14px 22px;
+  }
+
+  .hero-top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .ascii {
+    font-size: 11px;
+  }
+
+  .chip {
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  .chips {
+    gap: 7px;
+    padding: 10px 12px;
+  }
+}
+
+@media (pointer: coarse) {
+  .chip {
+    min-height: 40px;
+  }
+}
+
+/* --------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor,
+  .boot-caret,
+  .crt-on .crt-flicker {
+    animation: none;
+  }
+
+  .chip {
+    transition: none;
+  }
+}
+
+.reduced .cursor,
+.reduced .boot-caret,
+.reduced .crt-flicker {
+  animation: none;
+}

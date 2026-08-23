@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# portfolio — terminal edition
 
-## Getting Started
+A terminal-emulator style single-page portfolio: boot sequence, command prompt,
+phosphor themes, CRT effects, and a registry-driven command engine. Original
+implementation modeled on the UX patterns of classic terminal portfolios.
 
-First, run the development server:
+## Stack
+
+Vite + React 19 + TypeScript (strict). Static SPA — the production build emits
+plain files to `dist/`. No backend, no runtime network calls, system monospace
+font stack only.
+
+## Commands
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install        # install deps
+npm run dev        # dev server
+npm run build      # type-check (strict) + production build to dist/
+npm run preview    # serve dist/ locally
+npm run lint       # eslint (type-checked)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Editing content
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+All site content (identity, bio, socials, skills, projects, résumé link) lives
+in **`src/content.ts`**. Placeholder values are marked `// PLACEHOLDER:` and
+render with obvious `[placeholder]` markers. No other file needs touching for a
+content pass.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Terminal features
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Skippable BIOS-style boot sequence (any key/click)
+- Commands: `help`, `about`, `projects`, `project <id>`, `skills`, `contact`,
+  `resume`, `themes`, `theme <name>`, `crt [on|off]`, `sound [on|off]`,
+  `whoami`, `clear` (+ hidden easter eggs)
+- History recall (↑/↓) and Tab completion
+- 5 phosphor themes (green/amber/ice/paper/plasma), persisted in localStorage
+- CRT scanlines/flicker/vignette, toggleable; `prefers-reduced-motion` disables
+  flicker/typing animations
+- WebAudio-synthesized keypress/beep sounds (off by default)
+- Touch-friendly command chips below 768px / coarse pointers
