@@ -25,6 +25,8 @@ export interface CommandResult {
   clear?: boolean;
   /** Status-strip text; defaults to a ✓ line. */
   status?: string;
+  /** Marks the result as a failure for status-strip styling. */
+  isError?: boolean;
 }
 
 export interface CommandContext {

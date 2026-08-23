@@ -32,7 +32,8 @@ export default function App() {
   const reduced = usePrefersReducedMotion();
 
   const [booted, setBooted] = useState(false);
-  const [themeName, setThemeName] = useStoredString("nm.theme", defaultTheme);
+  const [storedTheme, setStoredTheme] = useStoredString("nm.theme", defaultTheme);
+  const themeName = isTheme(storedTheme) ? storedTheme : defaultTheme;
   const [crtEnabled, setCrtEnabled] = useStoredBool("nm.crt", true);
   const [soundEnabled, setSoundEnabled] = useStoredBool("nm.sound", false);
 
@@ -48,7 +49,7 @@ export default function App() {
   const session = useMemo(() => randomSession(), []);
 
   useEffect(() => {
-    document.documentElement.dataset.theme = isTheme(themeName) ? themeName : defaultTheme;
+    document.documentElement.dataset.theme = themeName;
   }, [themeName]);
 
   useEffect(() => {
@@ -116,7 +117,7 @@ export default function App() {
         themeName,
         setTheme: (name) => {
           if (!isTheme(name)) return false;
-          setThemeName(name);
+          setStoredTheme(name);
           return true;
         },
         themeNames: () => themeNames(),
@@ -134,14 +135,11 @@ export default function App() {
       setLines((prev) => [...prev, { ...echo, id: nextLineId() }]);
       enqueue(res);
       if (res.status) {
-        const isError =
-          /^(command not found|no project|unknown|usage|rm —|sudo)/.test(res.status) ||
-          res.lines.some((l) => l.kind === "err");
         setStatus(res.status);
-        setStatusIsError(isError);
+        setStatusIsError(res.isError === true);
       }
     },
-    [themeName, setThemeName, crtEnabled, setCrtEnabled, soundEnabled, setSoundEnabled, session, wipe, enqueue],
+    [themeName, setStoredTheme, crtEnabled, setCrtEnabled, soundEnabled, setSoundEnabled, session, wipe, enqueue],
   );
 
   const onAmbiguousCompletion = useCallback((options: string[]) => {

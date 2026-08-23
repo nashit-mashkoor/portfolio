@@ -18,16 +18,18 @@ const warn = (text: string): Line => ({ kind: "warn", text });
 const heading = (text: string): Line => ({ kind: "heading", text });
 const link = (text: string, url: string): Line => ({ kind: "link", text, url });
 
-const instant = (lines: Line[], status?: string): CommandResult => ({
+const instant = (lines: Line[], status?: string, isError?: boolean): CommandResult => ({
   lines,
   effect: "instant",
   status,
+  isError,
 });
 
-const typed = (lines: Line[], status?: string): CommandResult => ({
+const typed = (lines: Line[], status?: string, isError?: boolean): CommandResult => ({
   lines,
   effect: "typed",
   status,
+  isError,
 });
 
 const pad = (s: string, width: number): string => s.padEnd(width, " ");
@@ -109,6 +111,7 @@ const projectCommand: Command = {
           dim(`known ids: ${projects.map((p) => p.id).join(", ")}`),
         ],
         "project — missing id",
+        true,
       );
     }
     const id = args[0].toLowerCase();
@@ -120,6 +123,7 @@ const projectCommand: Command = {
           dim(`known ids: ${projects.map((pr) => pr.id).join(", ")}`),
         ],
         `project — unknown id '${args[0]}'`,
+        true,
       );
     }
     return instant(
@@ -210,6 +214,7 @@ const themeCommand: Command = {
       return instant(
         [err("usage: theme <name>"), dim(`available: ${ctx.themeNames().join(", ")}`)],
         "theme — missing name",
+        true,
       );
     }
     const name = args[0].toLowerCase();
@@ -217,6 +222,7 @@ const themeCommand: Command = {
       return instant(
         [err(`unknown theme '${name}'`), dim(`available: ${ctx.themeNames().join(", ")}`)],
         `theme — unknown '${name}'`,
+        true,
       );
     }
     ctx.beep();
@@ -229,7 +235,14 @@ const crtCommand: Command = {
   usage: "[on|off]",
   description: "toggle scanlines & flicker",
   run: (args, ctx) => {
-    const on = args.length === 0 ? !ctx.crtEnabled : args[0] === "on";
+    if (args.length > 0 && args[0].toLowerCase() !== "on" && args[0].toLowerCase() !== "off") {
+      return instant(
+        [err(`usage: crt [on|off] (got '${args[0]}')`)],
+        "crt — bad argument",
+        true,
+      );
+    }
+    const on = args.length === 0 ? !ctx.crtEnabled : args[0].toLowerCase() === "on";
     ctx.setCrt(on);
     ctx.beep();
     return instant(
@@ -244,7 +257,14 @@ const soundCommand: Command = {
   usage: "[on|off]",
   description: "toggle keypress beeps",
   run: (args, ctx) => {
-    const on = args.length === 0 ? !ctx.soundEnabled : args[0] === "on";
+    if (args.length > 0 && args[0].toLowerCase() !== "on" && args[0].toLowerCase() !== "off") {
+      return instant(
+        [err(`usage: sound [on|off] (got '${args[0]}')`)],
+        "sound — bad argument",
+        true,
+      );
+    }
+    const on = args.length === 0 ? !ctx.soundEnabled : args[0].toLowerCase() === "on";
     ctx.setSound(on);
     if (on) ctx.beep();
     return instant(
@@ -297,6 +317,7 @@ const sudoCommand: Command = {
         dim("This incident will be reported to absolutely no one."),
       ],
       "sudo — nice try",
+      true,
     );
   },
 };
@@ -315,9 +336,10 @@ const rmCommand: Command = {
           dim("Permission denied. The phosphor must flow."),
         ],
         "rm — denied",
+        true,
       );
     }
-    return instant([err(`rm: missing operand (and missing permission)`)], "rm — denied");
+    return instant([err(`rm: missing operand (and missing permission)`)], "rm — denied", true);
   },
 };
 
@@ -330,6 +352,7 @@ const exitCommand: Command = {
     return typed(
       [dim("There is no escape. The terminal is a state of mind."), dim("Type 'help' instead.")],
       "exit — denied",
+      true,
     );
   },
 };
@@ -400,6 +423,7 @@ export function executeCommand(input: string, ctx: CommandContext): CommandResul
     return instant(
       [err(`command not found: ${parts[0]} — type 'help'`)],
       `command not found: ${parts[0]}`,
+      true,
     );
   }
   return cmd.run(args, ctx);
