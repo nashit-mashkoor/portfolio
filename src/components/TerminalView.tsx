@@ -74,6 +74,12 @@ export function TerminalView({
     if (el) setCaret(el.selectionStart ?? el.value.length);
   };
 
+  const setInput = (v: string) => {
+    setValue(v);
+    setCaret(v.length);
+    inputRef.current?.setSelectionRange(v.length, v.length);
+  };
+
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -85,8 +91,7 @@ export function TerminalView({
 
   const submit = () => {
     const raw = value;
-    setValue("");
-    setCaret(0);
+    setInput("");
     setHistIdx(null);
     onSubmitCommand(raw);
     requestAnimationFrame(focusInput);
@@ -98,13 +103,10 @@ export function TerminalView({
     idx = Math.min(history.length, Math.max(0, idx + dir));
     if (idx === history.length) {
       setHistIdx(null);
-      setValue("");
-      setCaret(0);
+      setInput("");
     } else {
       setHistIdx(idx);
-      const v = history[idx];
-      setValue(v);
-      setCaret(v.length);
+      setInput(history[idx]);
     }
   };
 
@@ -115,9 +117,7 @@ export function TerminalView({
     if (!prefix) return;
     const matches = commandNamesForCompletion.filter((c) => c.startsWith(prefix));
     if (matches.length === 1) {
-      const v = matches[0] + " ";
-      setValue(v);
-      setCaret(v.length);
+      setInput(matches[0] + " ");
     } else if (matches.length > 1) {
       onAmbiguousCompletion(matches);
     }

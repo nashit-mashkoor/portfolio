@@ -145,7 +145,7 @@ const skillsCommand: Command = {
   name: "skills",
   description: "my toolbox, honestly rated",
   run: () => {
-    const lines: Line[] = [heading("skills")];
+    const lines: Line[] = [heading("skills"), dim("[placeholder] sample toolbox")];
     for (const g of skillGroups) {
       lines.push(out(""));
       lines.push(dim(`── ${g.group}`));
