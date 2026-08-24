@@ -4,7 +4,6 @@ import { TerminalView } from "./components/TerminalView";
 import {
   commandNames,
   executeCommand,
-  introBannerLines,
 } from "./commands";
 import { soundEngine, usePrefersReducedMotion, useStoredBool, useStoredString } from "./hooks";
 import { defaultTheme, isTheme, themeNames } from "./themes";
@@ -151,10 +150,9 @@ export default function App() {
 
   const onBootDone = useCallback(() => {
     setBooted(true);
-    enqueue({ lines: introBannerLines(), effect: reduced ? "instant" : "typed" });
     // focus slightly later so the keypress that skipped boot never lands in the input
     window.setTimeout(() => inputRef.current?.focus(), 80);
-  }, [enqueue, reduced]);
+  }, []);
 
   // ---------------------------------------------------------------- render
 
